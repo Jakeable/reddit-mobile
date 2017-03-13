@@ -9,17 +9,18 @@ import {
   xPromoExtraScreenViewData,
 } from 'lib/eventUtils';
 
-import { LISTING_CLICK_TYPES } from 'app/constants';
-
 import {
   getXPromoExperimentPayload,
   getFrequencyExperimentData,
   isEligibleCommentsPage,
   isEligibleListingPage,
   loginRequiredEnabled,
+  getExperimentRange,
+
 } from 'app/selectors/xpromo';
 
 import {
+  LISTING_CLICK_TYPES,
   EXPERIMENT_FREQUENCY_VARIANTS as FREQUENCIES,
   EVERY_TWO_WEEKS,
   LOCAL_STORAGE_KEYS,
@@ -140,11 +141,18 @@ function getClosingTimeRange(state) {
   }
   return defaultRange;
 }
- 
-function getLastClosedLimitUTS(state) {
-  const lastClosedStr = localStorage.getItem(BANNER_LAST_CLOSED);
-  const lastClosedDate = (lastClosedStr ? new Date(lastClosedStr).getTime() : 0);
-  return lastClosedDate + getClosingTimeRange(state);
+
+function getXpromoClosingTime(state, localStorageKey=BANNER_LAST_CLOSED) {
+  const lastClosedStr = localStorage.getItem(localStorageKey);
+  return (lastClosedStr ? new Date(lastClosedStr).getTime() : 0);
+}
+
+function getXpromoClosingRange(state, presetRange) {
+  return FREQUENCIES[(presetRange || getExperimentRange(state) || EVERY_TWO_WEEKS)];
+}
+
+function getXpromoClosingLimit(state) {
+  return getXpromoClosingTime(state)+getXpromoClosingRange(state);
 }
 
 export function getBranchLink(state, path, payload={}) {
@@ -204,7 +212,7 @@ export function shouldNotShowBanner(state) {
   }
   // Do not show the banner:
   // If closing date is in limit range still
-  if (getLastClosedLimitUTS(state) > Date.now()) {
+  if (getXpromoClosingLimit(state) > Date.now()) {
     return 'dismissed_previously';
   }
   // Show the banner
@@ -215,7 +223,6 @@ export function listingClickInitialState() {
   // Check if there's been a listing click in the last two weeks
   const lastClickedStr = localStorage.getItem(XPROMO_LAST_MODAL_CLICK);
   const lastModalClick = lastClickedStr ? new Date(lastClickedStr).getTime() : 0;
-
   return {
     ineligibilityReason: localStorageAvailable() ? null : 'local_storage_unavailable',
     lastModalClick,
@@ -234,7 +241,6 @@ export const markListingClickTimestampLocalStorage = (dateTime) => {
 
   localStorage.setItem(XPROMO_LAST_MODAL_CLICK, dateTime);
 };
-
 
 function interstitialType(state) {
   if (isEligibleListingPage(state)) {

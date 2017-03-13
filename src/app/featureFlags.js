@@ -64,6 +64,9 @@ const {
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_ANDROID,
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_IOS_CONTROL,
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_ANDROID_CONTROL,
+  // Persistent Xpromo
+  VARIANT_XPROMO_PERSISTENT_IOS,
+  VARIANT_XPROMO_PERSISTENT_ANDROID,
 } = flagConstants;
 
 const config = {
@@ -253,6 +256,22 @@ const config = {
       { or: [
         { variant: 'mweb_xpromo_interstitial_frequency_android:control_1' },
         { variant: 'mweb_xpromo_interstitial_frequency_android:control_2' },
+      ] },
+    ],
+  },
+  [VARIANT_XPROMO_PERSISTENT_IOS]: {
+    and: [
+      { allowedDevices: [IPHONE] },
+      { or: [
+        { variant: 'mweb_xpromo_persistent_ios:treatment' },
+      ] },
+    ],
+  },
+  [VARIANT_XPROMO_PERSISTENT_ANDROID]: {
+    and: [
+      { allowedDevices: [ANDROID] },
+      { or: [
+        { variant: 'mweb_xpromo_persistent_android:treatment' },
       ] },
     ],
   },

@@ -37,7 +37,8 @@ export const UserProfilePage = connect(mapStateToProps)(props => {
   return (
     <div className='UserProfilePage'>
       <Section>
-        { loaded && <UserProfileHeader
+        { loaded && 
+          <UserProfileHeader
             userName={ userName }
             userSubreddit={ subredditName }
             karma={ karma }

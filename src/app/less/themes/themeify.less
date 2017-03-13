@@ -30,14 +30,25 @@
   }
 }
 
-.themeifyXpromo(@rules: {}, @minimal: {}) {
-  // apply default styles
-  & { @rules(); }
-  // apply custom theme styles (root rule will
-  // be ignored if current class is not exist)
+.themeifyXpromo(@common: {}, @minimal: {}, @persist: {}) {
+  & { @common(); }
+
   &.xpromoMinimal,  
    .xpromoMinimal & { 
-    @rules();
+    @common();
     @minimal();
+  }
+  &.xpromoPersist,
+   .xpromoPersist & {
+    @common();
+    @persist();
+  }
+
+  // MIXINS (for any theme)
+  &.m-invisible,
+   .m-invisible & {
+    position: relative;
+    visibility: hidden;
+    &.fadeOut{ display: none }
   }
 }

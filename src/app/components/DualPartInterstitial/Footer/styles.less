@@ -4,7 +4,7 @@
 
 .DualPartInterstitialFooter {
   .themeifyXpromo(
-    { /* default theme */
+    @common: {
       position: absolute;
       padding-bottom: 16px;
       left: 0;
@@ -15,10 +15,17 @@
       background-color: @white;
       text-align: center;
     },
-    { /* minimal theme */
+    @minimal: {
       background-color: @semi-black-text;
       &__subtitle{ color: @white; }
       &__bulletList{ display: none; }
+    },
+    @persist: {
+      background-color: @semi-black-text;
+      &__subtitle{ color: @white; margin-bottom: 10px; }
+      &__dismissal,
+      &__bulletList{ display: none; }
+      &__button { margin-bottom: 5px; }
     }
   );
 

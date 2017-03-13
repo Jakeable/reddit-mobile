@@ -4,24 +4,31 @@
 @import (reference) '~app/less/mixins/modal';
 @import (reference) '~app/less/mixins/clearfix';
 
-
 .DualPartInterstitial {
   @logo-size: 80px;
   @wordmark-size: 36px;
   @rating-logo-size: 64px;
 
   .themeifyXpromo(
-    { /* default theme */ },
-    { /* minimal theme */
-      position: fixed;
-      bottom: 0;
-      width: 100%;
+    @minimal: {
       z-index: @z-index-menu;
-      opacity: 1;
-      .transition(all, 0.5s);
-
-      &.fadeOut { opacity: 0; }
-      &__content{ height: 0vh; }
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      .transition(bottom, 0.8s, 0, cubic-bezier(0.5, 0.1, 0.5, 1));
+      &.fadeOut { bottom: -100%; }
+      &__common,
+      &__content{ height: auto; }
+    },
+    @persist: {
+      z-index: @z-index-menu;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      .transition(bottom, 0.8s, 0, cubic-bezier(0.5, 0.1, 0.5, 1));
+      &.fadeOut { bottom: -100%; }
+      &__common,
+      &__content{ height: auto; }
     }
   );
 

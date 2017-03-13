@@ -2,6 +2,7 @@ import { find, some } from 'lodash';
 
 import {
   EXPERIMENT_FREQUENCY_VARIANTS,
+  EVERY_TIME,
   EVERY_HOUR,
   EVERY_DAY,
   flags as flagConstants,
@@ -14,11 +15,10 @@ import features, { isNSFWPage } from 'app/featureFlags';
 import getRouteMetaFromState from 'lib/getRouteMetaFromState';
 import { getExperimentData } from 'lib/experiments';
 import { getDevice, IPHONE, ANDROID } from 'lib/getDeviceFromState';
-
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 
 const { DAYMODE } = themes;
-const { USUAL, MINIMAL } = xpromoDisplayTheme;
+const { USUAL, MINIMAL, PERSIST } = xpromoDisplayTheme;
 
 const {
   // XPromo Login Required
@@ -38,6 +38,8 @@ const {
   // XPromo Interstitial Frequrency
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_IOS,
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_ANDROID,
+  VARIANT_XPROMO_PERSISTENT_IOS,
+  VARIANT_XPROMO_PERSISTENT_ANDROID,
 } = flagConstants;
 
 const EXPERIMENT_FULL = [
@@ -45,6 +47,8 @@ const EXPERIMENT_FULL = [
   VARIANT_XPROMO_LOGIN_REQUIRED_ANDROID,
   VARIANT_XPROMO_LOGIN_REQUIRED_IOS_CONTROL,
   VARIANT_XPROMO_LOGIN_REQUIRED_ANDROID_CONTROL,
+  VARIANT_XPROMO_PERSISTENT_IOS,
+  VARIANT_XPROMO_PERSISTENT_ANDROID,
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_IOS,
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_ANDROID,
 ];
@@ -69,6 +73,11 @@ const INTERSTITIAL_FREQUENCY_FLAGS = [
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_ANDROID,
 ];
 
+const XPROMO_PERSISTENT_FLAGS = [
+  VARIANT_XPROMO_PERSISTENT_IOS,
+  VARIANT_XPROMO_PERSISTENT_ANDROID,
+];
+
 const EXPERIMENT_NAMES = {
   [VARIANT_XPROMO_LOGIN_REQUIRED_IOS]: 'mweb_xpromo_require_login_ios',
   [VARIANT_XPROMO_LOGIN_REQUIRED_ANDROID]: 'mweb_xpromo_require_login_android',
@@ -80,6 +89,8 @@ const EXPERIMENT_NAMES = {
   [VARIANT_MODAL_LISTING_CLICK_ANDROID]: 'mweb_xpromo_modal_listing_click_android',
   [VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_IOS]: 'mweb_xpromo_interstitial_frequency_ios',
   [VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_ANDROID]: 'mweb_xpromo_interstitial_frequency_android',
+  [VARIANT_XPROMO_PERSISTENT_IOS]: 'mweb_xpromo_persistent_ios',
+  [VARIANT_XPROMO_PERSISTENT_ANDROID]: 'mweb_xpromo_persistent_android',
 };
 
 export function getRouteActionName(state) {
@@ -101,6 +112,9 @@ function activeXPromoExperimentName(state, flags=EXPERIMENT_FULL) {
 }
 
 export function xpromoTheme(state) {
+  if (isXPromoPersistent(state) && dismissedState(state)) {
+    return PERSIST;
+  }
   switch (getRouteActionName(state)) {
     case 'comments':
       return MINIMAL;
@@ -275,10 +289,21 @@ export function eligibleTimeForModalListingClick(state) {
  * - listingClickExperimentData
  * - getFrequencyExperimentData
  * - currentExperimentData
+ * - isXPromoPersistent
  */
-export function getFrequencyExperimentData(state) {
+export function getExperimentRange(state) {
+  // For persistentent experimant
+  // checking it first to trigger bucketing 
+  // event for Persistent experiment first
+  if (isXPromoPersistent(state)) {
+    return EVERY_TIME;
+  }
+  // For frequency experiment
   const experimentName = activeXPromoExperimentName(state, INTERSTITIAL_FREQUENCY_FLAGS);
-  return getExperimentData(state, experimentName);
+  const experimentData = getExperimentData(state, experimentName);
+  if (experimentData) {
+    return experimentData.variant;
+  }
 }
 
 export function currentExperimentData(state) {
@@ -302,12 +327,19 @@ export function getXPromoExperimentPayload(state) {
   return experimentPayload;
 }
 
+export function isXPromoPersistent(state) {
+  return anyFlagEnabled(state, XPROMO_PERSISTENT_FLAGS);
+}
+
 export function scrollPastState(state) {
   return state.xpromo.interstitials.scrolledPast;
 }
 
 export function scrollStartState(state) {
   return state.xpromo.interstitials.scrolledStart;
+}
+export function dismissedState(state) {
+  return state.xpromo.dismissed;
 }
 
 export function shouldShowXPromo(state) {
@@ -317,7 +349,7 @@ export function shouldShowXPromo(state) {
 }
 
 export function isPartOfXPromoExperiment(state) {
-  return shouldShowXPromo(state) && !!activeXPromoExperimentName(state);
+  return shouldShowXPromo(state) && anyFlagEnabled(state);
 }
 
 export function XPromoIsActive(state) {

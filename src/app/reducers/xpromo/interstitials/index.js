@@ -17,6 +17,7 @@ export const DEFAULT = {
   loginRequired: false, // is this the login-required variant
   scrolledPast: false, // have we scrolled past the interstitial / banner
   scrolledStart: false, // have we started to scroll past the interstitial / banner
+  dismissed: false,
 };
 
 export default function(state=DEFAULT, action={}) {
@@ -57,9 +58,14 @@ export default function(state=DEFAULT, action={}) {
     }
 
     case xpromoActions.PROMO_CLICKED: {
-      markBannerClosed();
       return merge(state, {
         showBanner: false,
+      });
+    }
+
+    case xpromoActions.PROMO_DISMISS_CLICKED: {
+      return merge(state, {
+        dismissed: true,
       });
     }
 

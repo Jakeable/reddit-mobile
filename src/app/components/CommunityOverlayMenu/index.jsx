@@ -87,7 +87,7 @@ export const CommunityOverlayMenu = (props) => {
             text='Popular'
             href='/'
             icon='icon-rising mint-circled-xl'
-            />,
+          />,
           <LinkRow
             key='all-link'
             text='All'
