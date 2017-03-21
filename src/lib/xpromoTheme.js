@@ -1,0 +1,33 @@
+import { xpromoDisplayTheme as theme } from 'app/constants';
+
+export default function getXpromoTheme(
+  xpromoTheme, 
+  scrollPast=false, 
+  isXPromoPersistentActive
+) {
+  switch (xpromoTheme) {
+    case theme.MINIMAL:
+      return {
+        visitTrigger : 'banner_button',
+        displayClass : {
+          'xpromoMinimal': true,
+          'fadeOut' : scrollPast,
+        },
+      };
+    case theme.PERSIST:
+      return {
+        visitTrigger : 'persist_banner_button',
+        displayClass : {
+          'xpromoPersist': true,
+          'fadeOut' : scrollPast,
+          'visiblePersist' : isXPromoPersistentActive,
+        },
+      };
+    case theme.USUAL:
+    default:
+      return {
+        visitTrigger : 'interstitial_button',
+        displayClass : {},
+      };
+  }
+}

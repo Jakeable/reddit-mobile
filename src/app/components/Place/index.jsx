@@ -42,7 +42,7 @@ export default connect(selector, mapDispatchToProps)(
             JSON.stringify({
               name: 'PLACE_MESSAGE',
               payload: {
-                Authorization: 'bearer ' + this.props.token,
+                Authorization: `bearer ${this.props.token}`,
               },
             }),
             config.placeDomain
@@ -57,7 +57,7 @@ export default connect(selector, mapDispatchToProps)(
 
     render() {
       const isSubredditPage = includes(this.props.currentPageUrl, '/r/place');
-      const placeUrl = config.placeDomain + '/place?webview=true';
+      const placeUrl = `${config.placeDomain}/place?webview=true`;
 
       const { placeRedirect } = this.props;
 

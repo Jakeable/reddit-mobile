@@ -11,12 +11,11 @@ import {
 
 import {
   getXPromoExperimentPayload,
-  getFrequencyExperimentData,
   isEligibleCommentsPage,
   isEligibleListingPage,
   loginRequiredEnabled,
   getExperimentRange,
-
+  isXPromoPersistent,
 } from 'app/selectors/xpromo';
 
 import {
@@ -48,6 +47,10 @@ function getLoidValues(accounts) {
     loid,
     loidCreated,
   };
+}
+
+export function isXPromoPersistentEnabled(state) {
+  return isXPromoPersistent(state)
 }
 
 export function getXPromoLinkforCurrentPage(state, linkType) {
@@ -133,15 +136,6 @@ export function getXPromoLink(state, path, linkType, additionalData={}) {
   });
 }
 
-function getClosingTimeRange(state) {
-  const defaultRange = FREQUENCIES[EVERY_TWO_WEEKS];
-  const experimentData = getFrequencyExperimentData(state);
-  if (experimentData) {
-    return (FREQUENCIES[experimentData.variant] || defaultRange);
-  }
-  return defaultRange;
-}
-
 function getXpromoClosingTime(state, localStorageKey=BANNER_LAST_CLOSED) {
   const lastClosedStr = localStorage.getItem(localStorageKey);
   return (lastClosedStr ? new Date(lastClosedStr).getTime() : 0);
@@ -153,6 +147,11 @@ function getXpromoClosingRange(state, presetRange) {
 
 function getXpromoClosingLimit(state) {
   return getXpromoClosingTime(state)+getXpromoClosingRange(state);
+}
+
+export function isXpromoClosed(state) {
+  const defaultRange = getXpromoClosingTime(state)+getXpromoClosingRange(state, EVERY_TWO_WEEKS);
+  return (defaultRange > Date.now());
 }
 
 export function getBranchLink(state, path, payload={}) {

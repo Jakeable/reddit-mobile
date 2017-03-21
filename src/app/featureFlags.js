@@ -22,7 +22,7 @@ import isFakeSubreddit from 'lib/isFakeSubreddit';
 
 const {
   BETA,
-  SMARTBANNER,
+  XPROMOBANNER,
   USE_BRANCH,
   // Recommended Content experiments
   VARIANT_NEXTCONTENT_BOTTOM,
@@ -71,7 +71,7 @@ const {
 
 const config = {
   [BETA]: true,
-  [SMARTBANNER]: {
+  [XPROMOBANNER]: {
     and: [
       { allowedPages: ['index', 'listing'] },
       { allowNSFW: false },
@@ -262,7 +262,10 @@ const config = {
   [VARIANT_XPROMO_PERSISTENT_IOS]: {
     and: [
       { allowedDevices: [IPHONE] },
+      { allowedPages: ['index', 'listing', 'comments'] },
+      { allowNSFW: false },
       { or: [
+        { url: 'xpromopersistent' },
         { variant: 'mweb_xpromo_persistent_ios:treatment' },
       ] },
     ],
@@ -270,7 +273,10 @@ const config = {
   [VARIANT_XPROMO_PERSISTENT_ANDROID]: {
     and: [
       { allowedDevices: [ANDROID] },
+      { allowedPages: ['index', 'listing', 'comments'] },
+      { allowNSFW: false },
       { or: [
+        { url: 'xpromopersistent' },
         { variant: 'mweb_xpromo_persistent_android:treatment' },
       ] },
     ],

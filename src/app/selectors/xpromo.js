@@ -15,6 +15,7 @@ import features, { isNSFWPage } from 'app/featureFlags';
 import getRouteMetaFromState from 'lib/getRouteMetaFromState';
 import { getExperimentData } from 'lib/experiments';
 import { getDevice, IPHONE, ANDROID } from 'lib/getDeviceFromState';
+import { isXpromoClosed } from 'lib/xpromoState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 
 const { DAYMODE } = themes;
@@ -38,6 +39,8 @@ const {
   // XPromo Interstitial Frequrency
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_IOS,
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_ANDROID,
+
+  // XPromo Persistent Banner
   VARIANT_XPROMO_PERSISTENT_IOS,
   VARIANT_XPROMO_PERSISTENT_ANDROID,
 } = flagConstants;
@@ -47,8 +50,6 @@ const EXPERIMENT_FULL = [
   VARIANT_XPROMO_LOGIN_REQUIRED_ANDROID,
   VARIANT_XPROMO_LOGIN_REQUIRED_IOS_CONTROL,
   VARIANT_XPROMO_LOGIN_REQUIRED_ANDROID_CONTROL,
-  VARIANT_XPROMO_PERSISTENT_IOS,
-  VARIANT_XPROMO_PERSISTENT_ANDROID,
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_IOS,
   VARIANT_XPROMO_INTERSTITIAL_FREQUENCY_ANDROID,
 ];
@@ -112,7 +113,7 @@ function activeXPromoExperimentName(state, flags=EXPERIMENT_FULL) {
 }
 
 export function xpromoTheme(state) {
-  if (isXPromoPersistent(state) && dismissedState(state)) {
+  if (isXPromoPersistent(state)) {
     return PERSIST;
   }
   switch (getRouteActionName(state)) {
@@ -252,7 +253,7 @@ export function listingClickExperimentData(state) {
  * events otherwise
  */
 export function xpromoModalListingClickVariantInfo(state) {
-  const { variant} = listingClickExperimentData(state);
+  const { variant } = listingClickExperimentData(state);
   const [ timePeriodString, dimissableString ] = variant.split('_');
 
   return {
@@ -287,17 +288,10 @@ export function eligibleTimeForModalListingClick(state) {
 /**
  * @TODO: These functions should refactored:
  * - listingClickExperimentData
- * - getFrequencyExperimentData
  * - currentExperimentData
  * - isXPromoPersistent
  */
 export function getExperimentRange(state) {
-  // For persistentent experimant
-  // checking it first to trigger bucketing 
-  // event for Persistent experiment first
-  if (isXPromoPersistent(state)) {
-    return EVERY_TIME;
-  }
   // For frequency experiment
   const experimentName = activeXPromoExperimentName(state, INTERSTITIAL_FREQUENCY_FLAGS);
   const experimentData = getExperimentData(state, experimentName);
@@ -326,20 +320,23 @@ export function getXPromoExperimentPayload(state) {
   }
   return experimentPayload;
 }
-
-export function isXPromoPersistent(state) {
-  return anyFlagEnabled(state, XPROMO_PERSISTENT_FLAGS);
-}
-
 export function scrollPastState(state) {
   return state.xpromo.interstitials.scrolledPast;
 }
-
 export function scrollStartState(state) {
   return state.xpromo.interstitials.scrolledStart;
 }
+
 export function dismissedState(state) {
-  return state.xpromo.dismissed;
+  return state.xpromo.persistent.dismissed;
+}
+export function isXPromoPersistentActive(state) {
+  return state.xpromo.persistent.active;
+}
+export function isXPromoPersistent(state) {
+  if(isXpromoClosed(state)){
+    return anyFlagEnabled(state, XPROMO_PERSISTENT_FLAGS);
+  }
 }
 
 export function shouldShowXPromo(state) {
@@ -347,11 +344,9 @@ export function shouldShowXPromo(state) {
     xpromoIsEnabledOnPage(state) &&
     xpromoIsEnabledOnDevice(state);
 }
-
 export function isPartOfXPromoExperiment(state) {
-  return shouldShowXPromo(state) && anyFlagEnabled(state);
+  return shouldShowXPromo(state) && anyFlagEnabled(state, EXPERIMENT_FULL);
 }
-
 export function XPromoIsActive(state) {
   return shouldShowXPromo(state) && xpromoIsConfiguredOnPage(state);
 }

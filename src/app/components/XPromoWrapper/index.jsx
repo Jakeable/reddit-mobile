@@ -1,19 +1,84 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-
 import * as xpromoActions from 'app/actions/xpromo';
+import * as xpromoPersist from 'lib/xpromoPersistState';
 import { XPROMO_SCROLLPAST, XPROMO_SCROLLUP } from 'lib/eventUtils';
+
 import { 
   xpromoThemeIsUsual,
+  dismissedState,
   scrollPastState,
   scrollStartState,
   isXPromoPersistent,
 } from 'app/selectors/xpromo';
 
-const T = React.PropTypes;
-
 class XPromoWrapper extends React.Component {
+
+  launchPersistentExperiment() {
+    if(this.props.isXPromoPersistent){
+      this.displayPersistBannerByTimer();
+    }
+  }
+
+  displayPersistBannerByTimer() {
+    const { dispatch, isInterstitialDismissed } = this.props;
+
+    xpromoPersist.runStatusCheck((status) => {
+
+      console.error('????', status);
+
+      switch (status) {
+
+        case xpromoPersist.statusKey.JUST_DISMISSED: {
+          dispatch(xpromoActions.trackXPromoEvent(status, {
+            interstitial_type: 'persistent_banner',
+            view_note: 'just_dismissed_and_show',
+          }));
+          break;
+        }
+
+        case xpromoPersist.statusKey.SHOW: {
+          dispatch(xpromoActions.promoPersistActivate());
+          dispatch(xpromoActions.trackXPromoEvent(status, {
+            interstitial_type: 'persistent_banner',
+            view_note: 'same_session',
+          }));
+          break;
+        }
+
+        case xpromoPersist.statusKey.NEW_SESSION: {
+          dispatch(xpromoActions.promoPersistActivate());
+          dispatch(xpromoActions.trackXPromoEvent(status, {
+            interstitial_type: 'persistent_banner',
+            view_note: 'new_session',
+          }));
+          break;
+        }
+
+        case xpromoPersist.statusKey.HIDE: {
+          dispatch(xpromoActions.promoPersistDeactivate());
+          dispatch(xpromoActions.trackXPromoEvent(status, {
+            interstitial_type: 'persistent_banner' ,
+            inelligibility_reason: 'hide_by_timeout',
+          }));
+          break;
+        }
+
+        default: {
+          dispatch(xpromoActions.promoPersistDeactivate());
+          dispatch(xpromoActions.trackXPromoEvent(status, {
+            interstitial_type: 'persistent_banner' ,
+            inelligibility_reason: 'recent_session',
+          }));
+        }
+
+      }
+
+    }, isInterstitialDismissed);
+
+  }
+
   onScroll = () => {
     // For now we will consider scrolling half the
     // viewport "scrolling past" the interstitial.
@@ -22,9 +87,11 @@ class XPromoWrapper extends React.Component {
       dispatch, 
       alreadyScrolledStart, 
       alreadyScrolledPast, 
-      xpromoThemeIsUsual, 
+      xpromoThemeIsUsual,
+      isXPromoPersistent,
     } = this.props;
 
+    // @TODO dispatch(xpromoActions) to actions/xpomo.js
     // should appears only once on the start
     // of the scrolled down by the viewport
     if (!xpromoThemeIsUsual && !alreadyScrolledStart) {
@@ -74,14 +141,6 @@ class XPromoWrapper extends React.Component {
     return isPastHalfViewport;
   }
 
-  componentDidMount() {
-    this.toggleOnScroll(true);
-  }
-
-  componentWillUnmount() {
-    this.toggleOnScroll(false);
-  }
-
   toggleOnScroll(state) {
     if (state) {
       window.addEventListener('scroll', this.onScroll);
@@ -90,6 +149,18 @@ class XPromoWrapper extends React.Component {
     }
   }
 
+  componentDidUpdate() {
+    this.launchPersistentExperiment();
+  }
+  componentWillMount() {
+    this.launchPersistentExperiment();
+  }
+  componentDidMount() {
+    this.toggleOnScroll(true);
+  }
+  componentWillUnmount() {
+    this.toggleOnScroll(false);
+  }
   render() {
     return this.props.children;
   }
@@ -100,6 +171,8 @@ const selector = createStructuredSelector({
   alreadyScrolledStart: state => scrollStartState(state),
   alreadyScrolledPast: state => scrollPastState(state),
   xpromoThemeIsUsual: state => xpromoThemeIsUsual(state),
+  isInterstitialDismissed: state => dismissedState(state),
+  isXPromoPersistent: state => isXPromoPersistent(state),
 });
 
 export default connect(selector)(XPromoWrapper);

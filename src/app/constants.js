@@ -103,7 +103,7 @@ export const BANNER_URLS_DIRECT = {
 // feature flags
 export const flags = {
   BETA: 'beta',
-  SMARTBANNER: 'banner',
+  XPROMOBANNER: 'banner',
   USE_BRANCH: 'useBranch',
   VARIANT_NEXTCONTENT_BOTTOM: 'experimentNextContentBottom',
   VARIANT_RECOMMENDED_BOTTOM: 'experimentRecommendedBottom',
@@ -195,6 +195,7 @@ export const EXPERIMENT_FREQUENCY_VARIANTS = {
 export const LOCAL_STORAGE_KEYS = {
   BANNER_LAST_CLOSED : 'bannerLastClosed',
   XPROMO_LAST_MODAL_CLICK: 'lastModalListingClick',
+  BANNER_PERSIST_SHOWED : 'lastPersistBannerShowed',
 };
 
 export const rulesModalExperimentSubreddits = ['AskHistorians', 'apple', 'CasualConversation', 'tourettes', 'PartyParrot', 'townofsalemgame', 'books', 'NeutralPolitics', 'history', 'freebies', 'battlestations', 'pcgaming', 'DBZDokkanBattle', 'analog', 'pokemongo', 'ClashRoyale', 'OnePieceTC', 'television', 'MealtimeVideos', 'steam_giveaway', 'marketing', 'toronto', 'ukpersonalfinance', 'lesbianactually', 'MLPLounge', 'SandersForPresident', 'DailyShow', 'mylittlepony', 'adventures', 'running', 'aspergers_Beta', 'VPN', 'woweconomy', 'NotTheOnion', 'Videos', 'needamod', 'scandal', 'yokaiwatch', 'jillstein', 'RandomActsOfBlowJob', 'NBA2K', 'SeattleWA', 'ccw', 'freelance', 'shutupandtakemymoney', 'chronicpain', 'jailbreak', 'iOSthemes', 'pathofexile', 'mylittleantisonic1', 'drugs', 'nfl', 'campingandhiking', 'DestinyTheGame', 'Louisville', 'Drugs', 'LGBTeens', 'politics', 'twitchplayspokemon', 'nintendo', 'LiverpoolFC', 'Judaism', 'restaurateur', 'powerlifting', 'parentsofmultiples', 'woahdude', 'JUSTNOMIL', 'offmychest', 'Lightroom', 'niu', 'gopro', 'StuckInThisAirport', 'History', 'Vinesauce', 'titlegore', 'partyparrot', 'NASCAR', 'wow', 'welding', 'icandrawthat', 'DiaryOfARedditor', 'bravefrontier', 'ToolBand', 'BoomBeach', 'CompetitiveOverwatch', 'WikiLeaks', 'Rainbow6', 'crypto', 'ShiftyLifeProTips', 'Electronics', 'AskElectronics', 'howtheworldworks', 'HITMAN', 'InfinityTrain', 'boulder', '2007scape', 'InternetIsBeautiful', 'androiddev', 'animenocontext', 'birthday', 'dirtykikpals', 'AT4W', 'NintendoSwitch', 'FireEmblemHeroes', 'amiibo', 'mildlyinfuriating', 'trailerparkboys', 'steam', 'korea', 'realms', 'wow', 'SubredditDrama', 'Wellthatsucks', 'TheoryOfReddit', 'BoomBeach', 'sitecore', 'SkincareAddiction', 'maninthehighcastle', 'DestinyTheGame', 'Minecraft', 'worldnews', 'OverwatchUniversity', 'thewalkingdead', 'natureismetal', 'SexyButNotPornofMen', 'confession', 'emulation', 'popheads', 'WritingPrompts', 'thenetherlands', 'BigBrother', 'razer', 'runescape', 'cordcutters', 'MorbidReality', 'opiates', 'DestinyLore', 'Neverwinter', 'im14andthisisfunny', 'AndroidGaming', 'phoenix', 'DarkNetMarkets', 'DarkNetMarketsNoobs', 'howtonotgiveafuck', 'youwontgetbanned', 'chess', 'csgo', 'lounge', 'prettygirls', 'Overwatch', 'AngelDensetsu', 'food', 'military', 'darknet'];

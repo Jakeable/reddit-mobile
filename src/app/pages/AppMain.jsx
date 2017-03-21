@@ -83,11 +83,7 @@ const AppMain = props => {
   if (statusCode !== 200) {
     return (
       <div className='AppMainPage'>
-        <NavFrame
-          showInterstitial={ false }
-          showDualPartInterstitial={ false }
-          showSmartBanner={ false }
-        >
+        <NavFrame>
           <ErrorPage status={ statusCode } url={ url } referrer={ referrer } />
         </NavFrame>
       </div>

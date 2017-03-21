@@ -10,7 +10,7 @@ import * as xpromoActions from 'app/actions/xpromo';
 createTest({ reducers: { interstitials }, routes }, ({ getStore, expect }) => {
   describe('/xpromo/interstitials', () => {
     describe('SHOW', () => {
-      it('should show the smart banner', () => {
+      it('should show the xpromo banner', () => {
         const { store } = getStore({ interstitials: DEFAULT });
         const expected = {
           ...DEFAULT,
@@ -24,7 +24,7 @@ createTest({ reducers: { interstitials }, routes }, ({ getStore, expect }) => {
     });
 
     describe('HIDE', () => {
-      it('should hide the smart banner', () => {
+      it('should hide the xpromo banner', () => {
         const { store } = getStore({ interstitials: DEFAULT });
 
         // Show and then hide to make sure we're setting and then clearing

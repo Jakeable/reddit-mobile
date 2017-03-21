@@ -10,8 +10,10 @@ import { combineReducers } from 'redux';
 
 import interstitials from './interstitials';
 import listingClick from './listingClick';
+import persistent from './persistent';
 
 export default combineReducers({
   interstitials,
   listingClick,
+  persistent,
 });

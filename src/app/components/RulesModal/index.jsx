@@ -45,23 +45,23 @@ function RulesModal(props) {
               </div>
               <footer className="RulesModal__footer">
                 <a 
-                    className="RulesModal__rulesLink"
-                    href={ `/r/${ subredditName }/about/rules` }
-                    target="_blank"
-                    >
+                  className="RulesModal__rulesLink"
+                  href={ `/r/${ subredditName }/about/rules` }
+                  target="_blank"
+                >
                   View the full list of rules.
                 </a>
                 <div className="RulesModal__footerButtonRow">
                   <button
-                      className="RulesModal__button RulesModal__declineButton"
-                      onClick={ onClickDecline }
-                      >
+                    className="RulesModal__button RulesModal__declineButton"
+                    onClick={ onClickDecline }
+                  >
                     Decline
                   </button>
                   <button
-                      className="RulesModal__button RulesModal__acceptButton"
-                      onClick={ onClickAccept }
-                      >
+                    className="RulesModal__button RulesModal__acceptButton"
+                    onClick={ onClickAccept }
+                  >
                     Agree
                   </button>
                 </div>

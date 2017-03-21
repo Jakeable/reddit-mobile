@@ -11,7 +11,7 @@
 
   .themeifyXpromo(
     @minimal: {
-      z-index: @z-index-menu;
+      z-index: @z-index-xpromo;
       position: fixed;
       width: 100%;
       bottom: 0;
@@ -21,12 +21,14 @@
       &__content{ height: auto; }
     },
     @persist: {
-      z-index: @z-index-menu;
+      z-index: @z-index-xpromo;
       position: fixed;
       width: 100%;
       bottom: 0;
-      .transition(bottom, 0.8s, 0, cubic-bezier(0.5, 0.1, 0.5, 1));
-      &.fadeOut { bottom: -100%; }
+      opacity: 0;
+      .transition(all, 0.4s, 0, cubic-bezier(0.5, 0.1, 0.5, 1));
+      &.fadeOut { bottom: -30%; }
+      &.visiblePersist { opacity: 1; }
       &__common,
       &__content{ height: auto; }
     }
