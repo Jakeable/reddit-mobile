@@ -150,6 +150,11 @@ function getXpromoClosingLimit(state) {
   return getXpromoClosingTime(state)+getXpromoClosingRange(state);
 }
 
+export function isXpromoClosed(state) {
+  const defaultRange = getXpromoClosingTime(state)+getXpromoClosingRange(state, XPROMO_DEFAULT_CLOSING_RANGE);
+  return (defaultRange > Date.now());
+}
+
 export function getBranchLink(state, path, payload={}) {
   const { user, accounts } = state;
 

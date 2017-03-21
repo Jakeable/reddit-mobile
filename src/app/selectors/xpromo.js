@@ -13,7 +13,7 @@ import getRouteMetaFromState from 'lib/getRouteMetaFromState';
 import { getExperimentData } from 'lib/experiments';
 import { getDevice, IPHONE, ANDROID } from 'lib/getDeviceFromState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
-import { shouldNotListingClick } from 'lib/smartBannerState';
+import { shouldNotListingClick, isXpromoClosed } from 'lib/smartBannerState';
 
 const { DAYMODE } = themes;
 const { USUAL, MINIMAL, PERSIST } = xpromoDisplayTheme;
@@ -113,7 +113,7 @@ function activeXPromoExperimentName(state, flags=EXPERIMENT_FULL) {
 }
 
 export function xpromoTheme(state) {
-  if (isXPromoPersistent(state) && dismissedState(state)) {
+  if (isXPromoPersistent(state) && dismissedState(state) || isXpromoClosed(state)) {
     return PERSIST;
   }
   switch (getRouteActionName(state)) {

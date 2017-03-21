@@ -47,6 +47,7 @@ export const canListingClick = () => ({ type: CAN_LISTING_CLICK });
 
 export const PROMO_DISMISS_CLICKED = 'XPROMO_DISMISS_CLICKED';
 export const promoDismissed = (dismissType) => async (dispatch) => {
+  markBannerClosed();
   dispatch({ type: PROMO_DISMISS_CLICKED });
   if (dismissType) {
     dispatch(trackXPromoEvent(XPROMO_DISMISS, { dismiss_type: dismissType }));
