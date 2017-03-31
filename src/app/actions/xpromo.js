@@ -28,6 +28,18 @@ export const show = () => ({ type: SHOW });
 export const HIDE = 'XPROMO__HIDE';
 export const hide = () => ({ type: HIDE });
 
+
+
+
+export const PROMO_SHOW = 'XPROMO__SHOW__ONLY';
+export const promoShowOnly = () => ({ type: PROMO_SHOW });
+
+export const PROMO_HIDE = 'XPROMO__HIDE__ONLY';
+export const promoHideOnly = () => ({ type: PROMO_HIDE });
+
+
+
+
 export const PROMO_CLICKED = 'XPROMO__PROMO_CLICKED';
 export const promoClicked = (isXPromoPersistDisplay=false) => async (dispatch) => {
   markBannerClosed();

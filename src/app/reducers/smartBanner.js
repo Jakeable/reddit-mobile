@@ -14,6 +14,7 @@ export const DEFAULT = {
   scrolledPast: false,
   scrolledStart: false,
   dismissed: false,
+  visibility: false,
 };
 
 export default function(state=DEFAULT, action={}) {
@@ -28,6 +29,23 @@ export default function(state=DEFAULT, action={}) {
     case xpromoActions.HIDE: {
       return DEFAULT;
     }
+
+
+
+
+    case xpromoActions.PROMO_SHOW: {
+      return merge(state, {
+        visibility: true,
+      });
+    }
+    case xpromoActions.PROMO_HIDE: {
+      return merge(state, {
+        visibility: false,
+      });
+    }
+
+
+
 
     case xpromoActions.RECORD_SHOWN: {
       return merge(state, {

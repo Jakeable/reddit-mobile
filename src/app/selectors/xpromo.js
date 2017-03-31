@@ -288,6 +288,9 @@ export function scrollStartState(state) {
 export function dismissedState(state) {
   return state.smartBanner.dismissed;
 }
+export function visibilityState(state) {
+  return state.smartBanner.visibility;
+}
 
 export function shouldShowXPromo(state) {
   return state.smartBanner.showBanner &&

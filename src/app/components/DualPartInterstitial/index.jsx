@@ -19,6 +19,7 @@ import {
   scrollPastState,
   isXPromoPersistent,
   xpromoTheme,
+  visibilityState,
 } from 'app/selectors/xpromo';
 
 function getThemeData(xpromoTheme, scrollPast=false) {
@@ -49,9 +50,13 @@ function getThemeData(xpromoTheme, scrollPast=false) {
 }
 
 export function DualPartInterstitial(props) {
-  const { scrollPast, xpromoTheme, mixin } = props;
+  const { scrollPast, xpromoTheme, mixin, persistXPromoState, visibilityState } = props;
   const componentClass = 'DualPartInterstitial';
   const themeDisplayClass = getThemeData(xpromoTheme, scrollPast).displayClass;
+
+  if (persistXPromoState) {
+    themeDisplayClass.visiblePersist = visibilityState;
+  }
 
   return (
     <XPromoWrapper>
@@ -72,8 +77,9 @@ export const selector = createSelector(
   scrollPastState,
   isXPromoPersistent,
   xpromoTheme,
-  (device, scrollPast, persistXPromoState, xpromoTheme) => ({ 
-    device, scrollPast, persistXPromoState, xpromoTheme,
+  visibilityState,
+  (device, scrollPast, persistXPromoState, xpromoTheme, visibilityState) => ({ 
+    device, scrollPast, persistXPromoState, xpromoTheme, visibilityState,
   }),
 );
 
