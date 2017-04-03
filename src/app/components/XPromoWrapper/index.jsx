@@ -9,13 +9,22 @@ import {
   scrollPastState,
   scrollStartState,
   isXPromoPersistent,
+  dismissedState,
 } from 'app/selectors/xpromo';
 
 
 
 let displayTimer;
 
+const config = { 
+  showTime  : 1*10*1000,
+  hideTime  : 1*20*1000,
+};
 
+console.error('=================');
+console.error('SHOW TIME:', `${config.showTime/1000}s`);
+console.error('HIDE TIME:', `${(config.hideTime - config.showTime)/1000}s`);
+console.error('=================');
 
 const T = React.PropTypes;
 
@@ -23,6 +32,90 @@ class XPromoWrapper extends React.Component {
   static propTypes = {
     recordXPromoShown: T.func.isRequired,
   };
+
+  displayPersistBannerByTimer() {
+    /*
+     * CONFIG
+     */ 
+    const { dispatch } = this.props;
+
+    /*
+     * LS CONTROLLER
+     */ 
+    const key = 'bannerPersistDisplay';
+    const getLocalStorageKey = () => {
+      const lskey = localStorage.getItem(key);
+      return lskey ? JSON.parse(lskey) : setLocalStorageKey({ time: Date.now() });
+    };
+    const setLocalStorageKey = (val) => {
+      const lsVal = JSON.stringify(val);
+      localStorage.setItem(key, lsVal);
+      return val;
+    };
+
+    /*
+     * DISPLAY CONTROLLER
+     */
+    const displayToggle = (state) => {
+      dispatch(xpromoActions[state? 'promoShowOnly' : 'promoHideOnly']());
+      return state;
+    };
+
+    /*
+     * CHECKER
+     */ 
+    const checker = () => {
+
+      // Check if banner was NOT dismissed? 
+      // @TODO use constant instead...
+      if (!localStorage.getItem('bannerLastClosed')) {
+        return displayToggle(true);
+      }
+
+      const param = getLocalStorageKey();
+
+      // Can we show the banner?
+      if (Date.now() <= (param.time + config.showTime)) {
+        console.error('> LESS SHOW TIME ->', 'show');
+        return displayToggle(true);
+      } else 
+
+      // If more then HIDE time 
+      // and the session is new -> show the banner.
+      if ((Date.now() > (param.time + config.hideTime)) && !this.props.dismissedState) {
+        setLocalStorageKey({ time: Date.now() });
+        dispatch(xpromoActions.promoDismissedOnly());
+        console.error('> OVER HIDE TIME && NEW SESSION ->', 'change to show');
+        return displayToggle(true);
+      } 
+
+      // For other cases we dont 
+      // need to show up the bunner
+      
+      displayToggle(false);
+      console.error('> HIDE AND STOP TIMER ->', 'hide');
+      
+    };
+
+    /*
+     * TIMER
+     */ 
+    clearTimeout(displayTimer);
+    const timer = () => {
+      if (checker()) {
+        displayTimer = setTimeout(timer, 1000);
+      } else {
+        clearTimeout(displayTimer);
+      }
+    };
+    timer.call(this);
+
+  }
+
+
+
+
+
 
   onScroll = () => {
     // For now we will consider scrolling half the 
@@ -97,114 +190,20 @@ class XPromoWrapper extends React.Component {
 
 
 
-  displayPersistBannerByTimer() {
-    /*
-     * CONFIG
-     */ 
-    const { dispatch } = this.props;
-    const config = { 
-      duration  : 3, 
-      showTime  : 1*5*1000, // 1*60*100,
-      hideTime  : 1*10*1000, // 11*60*100,
-      period    : 1*20*1000, // 24*60*60*1000,
-    };
 
-    /*
-     * TIMER
-     */ 
-    clearTimeout(displayTimer);
-    const timer = () => {
-      displayTimer = setTimeout(()=>{ 
-        checker();
-        timer();
-      }, 1000);
-    };
-    timer();
-
-    /*
-     * CHECKER
-     */ 
-    const checker = () => {
-      const param = getLocalStorageKey();
-
-      if (!localStorage.getItem('bannerLastClosed')) {
-        displayToggle(true);
-        return false;
-      }
-
-      // если можем показывать баннер
-      if (Date.now() <= (param.time + config.showTime)) {
-        console.error('> LESS SHOW TIME ->', 'show', param.count);
-        displayToggle(true);
-      } else {
-        displayToggle(false);
-        // если количествео показов
-        // меньше частоты показа
-        if (param.count < config.duration) {
-          // проверяем не находимся ли мы в интервале
-          // времени когда еще ненадо покзаывать баннер
-          if (Date.now() < (param.time + config.hideTime)) {
-            console.error('> LESS HIDE TIME ->', 'hide', param.count);
-          } else {
-            console.error('> OVER HIDE TIME ->', 'change', param.count);
-            setLocalStorageKey({ time: Date.now(), count: param.count +=1 });
-          }
-        } else {
-          // есди мы за пределами 3 паказов то следим за тем
-          // чтобы текущее время не привысило полный период до
-          // следующих 3 показов
-          if (Date.now() < (param.time + config.period)) {
-            console.error('> LESS PERIOD TIME ->', 'hide', param.count);
-          } else {
-            console.error('> OVER PERIOD TIME ->', 'change', param.count);
-            setLocalStorageKey({ time: Date.now(), count: 1 });
-          }
-        }
-      }
-    };
-
-    /*
-     * LS CONTROLLER
-     */ 
-    const key = 'bannerPersistDisplay';
-    const getLocalStorageKey = () => {
-      const lskey = localStorage.getItem(key);
-      if (lskey) {
-        return JSON.parse(lskey);
-      }
-      return setLocalStorageKey({ time: Date.now(), count: 1 });
-      
-    };
-    const setLocalStorageKey = (val) => {
-      const lsVal = JSON.stringify(val);
-      localStorage.setItem(key, lsVal);
-      return val;
-    };
-
-    /*
-     * DISPLAY CONTROLLER
-     */
-    const displayToggle = (state) => {
-      dispatch(xpromoActions[state? 'promoShowOnly' : 'promoHideOnly']());
-    };
+  componentWillMount() {
+    if (isXPromoPersistent) {
+      this.displayPersistBannerByTimer();
+    } else {
+      clearTimeout(displayTimer);
+    }
   }
-
-
-
-
-
 
   componentDidMount() {
     // Indicate that we've displayed a crosspromotional UI, 
     // so we don't keep showing them during this browsing session.
     this.props.recordXPromoShown();
     this.toggleOnScroll(true);
-
-    if (isXPromoPersistent) {
-      this.displayPersistBannerByTimer();
-    } else {
-      clearTimeout(displayTimer);
-    }
   }
 
   componentWillUnmount() {
@@ -221,6 +220,7 @@ const selector = createStructuredSelector({
   alreadyScrolledStart: state => scrollStartState(state),
   alreadyScrolledPast: state => scrollPastState(state),
   xpromoThemeIsUsual: state => xpromoThemeIsUsual(state),
+  dismissedState: state => dismissedState(state),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
