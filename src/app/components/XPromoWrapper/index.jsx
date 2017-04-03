@@ -9,13 +9,28 @@ import {
   scrollPastState,
   scrollStartState,
   isXPromoPersistent,
+  dismissedState,
 } from 'app/selectors/xpromo';
 
 
 
 let displayTimer;
 
+const config = { 
+  // duration  : 3, 
+  // showTime  : 1*60*1000, // 1*60*100,
+  // hideTime  : 10*60*1000, // 11*60*100,
+  // period    : 20*60*1000, // 24*60*60*1000,
+  showTime  : 1*20*1000, 
+  hideTime  : 1*40*1000, 
+  period    : 1*60*1000, 
+};
 
+console.error('=================');
+console.error('SHOW BANNER TIME:', `${config.showTime/60/1000}min`);
+console.error('HIDE BUNNER TIME:', `${config.hideTime/60/1000}min`);
+console.error('PERIOD BUNNER TIME:', `${config.period/60/1000}min`);
+console.error('=================');
 
 const T = React.PropTypes;
 
@@ -23,6 +38,110 @@ class XPromoWrapper extends React.Component {
   static propTypes = {
     recordXPromoShown: T.func.isRequired,
   };
+
+  displayPersistBannerByTimer() {
+    /*
+     * CONFIG
+     */ 
+    const { dispatch } = this.props;
+
+    /*
+     * TIMER
+     */ 
+    clearTimeout(displayTimer);
+    const timer = () => {
+      displayTimer = setTimeout(() => { 
+        checker();
+        timer();
+      }, 1000);
+    };
+    timer();
+
+    /*
+     * CHECKER
+     */ 
+    const checker = () => {
+      // Check if banner was NOT dismissed? 
+      // @TODO use constant instead...
+      if (!localStorage.getItem('bannerLastClosed')) {
+        return displayToggle(true);
+      }
+
+      const param = getLocalStorageKey();
+
+      // Can we show the banner?
+      if (Date.now() <= (param.time + config.showTime)) {
+
+        displayToggle(true);
+        console.error('> LESS SHOW TIME ->', 'show', param.count);
+
+      } else {
+
+        displayToggle(false);
+
+        // If more than 10 minutes (by design) 
+        // and the session is new -> show the banner.
+        if ((Date.now() > (param.time + config.hideTime)) && !this.props.dismissedState) {
+
+          setLocalStorageKey({ time: Date.now() });
+          dispatch(xpromoActions.promoDismissedOnly());
+          console.error('> OVER HIDE TIME && NEW SESSION ->', 'change to show');
+
+        } else if ((Date.now() > (param.time + config.period))) {
+
+          setLocalStorageKey({ time: Date.now() });
+          console.error('> OVER PERIOD TIME ->', 'change to show');
+
+        } else if ((Date.now() > (param.time + config.hideTime)) && this.props.dismissedState) {
+
+          console.error('> OVER HIDE TIME BUT SAME SESSION ->', 'hide');
+
+        } else if ((Date.now() < (param.time + config.hideTime))) {
+
+          console.error('> LESS HIDE TIME ->', 'hide');
+        }
+      }
+    };
+
+    /*
+     * LS CONTROLLER
+     */ 
+    const key = 'bannerPersistDisplay';
+    const getLocalStorageKey = () => {
+      const lskey = localStorage.getItem(key);
+      return lskey ? JSON.parse(lskey) : setLocalStorageKey({ time: Date.now() });
+    };
+    const setLocalStorageKey = (val) => {
+      const lsVal = JSON.stringify(val);
+      localStorage.setItem(key, lsVal);
+      return val;
+    };
+
+    /*
+     * DISPLAY CONTROLLER
+     */
+    const displayToggle = (state) => {
+      dispatch(xpromoActions[state? 'promoShowOnly' : 'promoHideOnly']());
+      return state;
+    };
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   onScroll = () => {
     // For now we will consider scrolling half the 
@@ -96,98 +215,101 @@ class XPromoWrapper extends React.Component {
 
 
 
+  
 
-  displayPersistBannerByTimer() {
-    /*
-     * CONFIG
-     */ 
-    const { dispatch } = this.props;
-    const config = { 
-      duration  : 3, 
-      showTime  : 1*5*1000, // 1*60*100,
-      hideTime  : 1*10*1000, // 11*60*100,
-      period    : 1*20*1000, // 24*60*60*1000,
-    };
 
-    /*
-     * TIMER
-     */ 
-    clearTimeout(displayTimer);
-    const timer = () => {
-      displayTimer = setTimeout(()=>{ 
-        checker();
-        timer();
-      }, 1000);
-    };
-    timer();
 
-    /*
-     * CHECKER
-     */ 
-    const checker = () => {
-      const param = getLocalStorageKey();
+  // displayPersistBannerByTimer() {
+  //   /*
+  //    * CONFIG
+  //    */ 
+  //   const { dispatch } = this.props;
+  //   // const config = { 
+  //   //   // duration  : 3, 
+  //   //   showTime  : 1*60*1000, // 1*60*100,
+  //   //   hideTime  : 11*60*1000, // 11*60*100,
+  //   //   period    : 24*60*60*1000, // 24*60*60*1000,
+  //   // };
 
-      if (!localStorage.getItem('bannerLastClosed')) {
-        displayToggle(true);
-        return false;
-      }
+  //   /*
+  //    * TIMER
+  //    */ 
+  //   clearTimeout(displayTimer);
+  //   const timer = () => {
+  //     displayTimer = setTimeout(()=>{ 
+  //       checker();
+  //       timer();
+  //     }, 1000);
+  //   };
+  //   timer();
 
-      // если можем показывать баннер
-      if (Date.now() <= (param.time + config.showTime)) {
-        console.error('> LESS SHOW TIME ->', 'show', param.count);
-        displayToggle(true);
-      } else {
-        displayToggle(false);
-        // если количествео показов
-        // меньше частоты показа
-        if (param.count < config.duration) {
-          // проверяем не находимся ли мы в интервале
-          // времени когда еще ненадо покзаывать баннер
-          if (Date.now() < (param.time + config.hideTime)) {
-            console.error('> LESS HIDE TIME ->', 'hide', param.count);
-          } else {
-            console.error('> OVER HIDE TIME ->', 'change', param.count);
-            setLocalStorageKey({ time: Date.now(), count: param.count +=1 });
-          }
-        } else {
-          // есди мы за пределами 3 паказов то следим за тем
-          // чтобы текущее время не привысило полный период до
-          // следующих 3 показов
-          if (Date.now() < (param.time + config.period)) {
-            console.error('> LESS PERIOD TIME ->', 'hide', param.count);
-          } else {
-            console.error('> OVER PERIOD TIME ->', 'change', param.count);
-            setLocalStorageKey({ time: Date.now(), count: 1 });
-          }
-        }
-      }
-    };
+  //   /*
+  //    * CHECKER
+  //    */ 
+  //   const checker = () => {
+  //     const param = getLocalStorageKey();
 
-    /*
-     * LS CONTROLLER
-     */ 
-    const key = 'bannerPersistDisplay';
-    const getLocalStorageKey = () => {
-      const lskey = localStorage.getItem(key);
-      if (lskey) {
-        return JSON.parse(lskey);
-      }
-      return setLocalStorageKey({ time: Date.now(), count: 1 });
+  //     if (!localStorage.getItem('bannerLastClosed')) {
+  //       displayToggle(true);
+  //       return false;
+  //     }
+
+  //     // если можем показывать баннер
+  //     if (Date.now() <= (param.time + config.showTime)) {
+  //       console.error('> LESS SHOW TIME ->', 'show', param.count);
+  //       displayToggle(true);
+  //     } else {
+  //       displayToggle(false);
+  //       // // если количествео показов
+  //       // // меньше частоты показа
+  //       // if (param.count < config.duration) {
+  //         // проверяем не находимся ли мы в интервале
+  //         // времени когда еще ненадо покзаывать баннер
+  //         if (Date.now() < (param.time + config.hideTime)) {
+  //           console.error('> LESS HIDE TIME ->', 'hide', param.count);
+  //         } else {
+  //           console.error('> OVER HIDE TIME ->', 'change', param.count);
+  //           setLocalStorageKey({ time: Date.now(), count: param.count +=1 });
+  //         }
+  //       // } else {
+  //       //   // есди мы за пределами 3 паказов то следим за тем
+  //       //   // чтобы текущее время не привысило полный период до
+  //       //   // следующих 3 показов
+  //       //   if (Date.now() < (param.time + config.period)) {
+  //       //     console.error('> LESS PERIOD TIME ->', 'hide', param.count);
+  //       //   } else {
+  //       //     console.error('> OVER PERIOD TIME ->', 'change', param.count);
+  //       //     setLocalStorageKey({ time: Date.now(), count: 1 });
+  //       //   }
+  //       // }
+  //     }
+  //   };
+
+  //   /*
+  //    * LS CONTROLLER
+  //    */ 
+  //   const key = 'bannerPersistDisplay';
+  //   const getLocalStorageKey = () => {
+  //     const lskey = localStorage.getItem(key);
+  //     if (lskey) {
+  //       return JSON.parse(lskey);
+  //     }
+  //     return setLocalStorageKey({ time: Date.now(), count: 1 });
       
-    };
-    const setLocalStorageKey = (val) => {
-      const lsVal = JSON.stringify(val);
-      localStorage.setItem(key, lsVal);
-      return val;
-    };
+  //   };
+  //   const setLocalStorageKey = (val) => {
+  //     const lsVal = JSON.stringify(val);
+  //     localStorage.setItem(key, lsVal);
+  //     return val;
+  //   };
 
-    /*
-     * DISPLAY CONTROLLER
-     */
-    const displayToggle = (state) => {
-      dispatch(xpromoActions[state? 'promoShowOnly' : 'promoHideOnly']());
-    };
-  }
+  //   /*
+  //    * DISPLAY CONTROLLER
+  //    */
+  //   const displayToggle = (state) => {
+  //     dispatch(xpromoActions[state? 'promoShowOnly' : 'promoHideOnly']());
+  //   };
+  // }
 
 
 
@@ -221,6 +343,7 @@ const selector = createStructuredSelector({
   alreadyScrolledStart: state => scrollStartState(state),
   alreadyScrolledPast: state => scrollPastState(state),
   xpromoThemeIsUsual: state => xpromoThemeIsUsual(state),
+  dismissedState: state => dismissedState(state),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({

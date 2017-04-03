@@ -49,7 +49,7 @@ class DualPartInterstitialFooter extends React.Component {
       dispatch(redirect(this.loginLink()));
     } else {
       if (persistXPromoState) {
-        localStorage.setItem('bannerPersistDisplay', JSON.stringify({ time: Date.now(), count: 1 }));
+        localStorage.setItem('bannerPersistDisplay', JSON.stringify({ time: Date.now() }));
       } else {
         dispatch(xpromoActions.close());
       }

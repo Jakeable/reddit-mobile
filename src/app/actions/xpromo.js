@@ -65,6 +65,9 @@ export const promoDismissed = (dismissType) => async (dispatch) => {
     dispatch(trackXPromoEvent(XPROMO_DISMISS, { dismiss_type: dismissType }));
   }
 };
+export const promoDismissedOnly = () => async (dispatch) => {
+  dispatch({ type: PROMO_DISMISS_CLICKED });
+};
 
 export const MARK_LISTING_CLICK_TIMESTAMP = 'XPROMO__MARK_LISTING_CLICK_TIMESTAMP';
 export const markListingClickTimeStamp = () => async (dispatch) => {
