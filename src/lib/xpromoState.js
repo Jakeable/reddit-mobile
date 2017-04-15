@@ -50,7 +50,7 @@ function getLoidValues(accounts) {
 }
 
 export function isXPromoPersistentEnabled(state) {
-  return isXPromoPersistent(state)
+  return isXPromoPersistent(state);
 }
 
 export function getXPromoLinkforCurrentPage(state, linkType) {
@@ -149,7 +149,7 @@ function getXpromoClosingLimit(state) {
   return getXpromoClosingTime(state)+getXpromoClosingRange(state);
 }
 
-export function isXpromoClosed(state) {
+export function isInterstitialDimissed(state) {
   const defaultRange = getXpromoClosingTime(state)+getXpromoClosingRange(state, EVERY_TWO_WEEKS);
   return (defaultRange > Date.now());
 }

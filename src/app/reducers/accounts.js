@@ -24,6 +24,11 @@ export default function(state=DEFAULT, action={}) {
               owner: 'channels',
               experiment_id: 1234,
             },
+            // mweb_xpromo_modal_listing_click_ios: {
+            //   variant: 'hourly_dismissible',
+            //   owner: 'channels',
+            //   experiment_id: 1235,
+            // },
             // mweb_xpromo_interstitial_frequency_ios: {
             //   variant: 'every_day',
             //   owner: 'channels',

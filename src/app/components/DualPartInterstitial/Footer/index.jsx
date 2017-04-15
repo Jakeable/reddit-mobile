@@ -68,7 +68,7 @@ class DualPartInterstitialFooter extends React.Component {
       nativeInterstitialLink,
       navigator,
       requireLogin,
-      xpromoTheme
+      xpromoTheme,
     } = this.props;
 
     let dismissal;

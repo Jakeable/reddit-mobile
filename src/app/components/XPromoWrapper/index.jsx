@@ -16,7 +16,7 @@ import {
 class XPromoWrapper extends React.Component {
 
   launchPersistentExperiment() {
-    if(this.props.isXPromoPersistent){
+    if (this.props.isXPromoPersistent) {
       this.displayPersistBannerByTimer();
     }
   }
@@ -25,40 +25,38 @@ class XPromoWrapper extends React.Component {
     const { dispatch, isInterstitialDismissed } = this.props;
 
     xpromoPersist.runStatusCheck((status) => {
-
-      console.error('????', status);
-
       switch (status) {
-
         case xpromoPersist.statusKey.JUST_DISMISSED: {
-          dispatch(xpromoActions.trackXPromoEvent(status, {
+          console.error('TESTING >', 'Event: cs.xpromo_view', ' -> ', 'just_dismissed_and_show');
+          dispatch(xpromoActions.trackXPromoEvent('cs.xpromo_view', {
             interstitial_type: 'persistent_banner',
-            view_note: 'just_dismissed_and_show',
           }));
           break;
         }
 
         case xpromoPersist.statusKey.SHOW: {
+          console.error('TESTING >', 'Event: cs.xpromo_view', ' -> ', 'show_banner');
           dispatch(xpromoActions.promoPersistActivate());
-          dispatch(xpromoActions.trackXPromoEvent(status, {
+          dispatch(xpromoActions.trackXPromoEvent('cs.xpromo_view', {
             interstitial_type: 'persistent_banner',
-            view_note: 'same_session',
           }));
           break;
         }
 
         case xpromoPersist.statusKey.NEW_SESSION: {
+          console.error('TESTING >', 'Event: cs.xpromo_ineligible', ' -> ', 'new_round_of_showing');
           dispatch(xpromoActions.promoPersistActivate());
-          dispatch(xpromoActions.trackXPromoEvent(status, {
+          dispatch(xpromoActions.trackXPromoEvent('cs.xpromo_ineligible', {
             interstitial_type: 'persistent_banner',
-            view_note: 'new_session',
+            inelligibility_reason: 'new_round_of_showing',
           }));
           break;
         }
 
         case xpromoPersist.statusKey.HIDE: {
+          console.error('TESTING >', 'Event: cs.xpromo_dismiss', ' -> ', 'hide_by_timeout');
           dispatch(xpromoActions.promoPersistDeactivate());
-          dispatch(xpromoActions.trackXPromoEvent(status, {
+          dispatch(xpromoActions.trackXPromoEvent('cs.xpromo_dismiss', {
             interstitial_type: 'persistent_banner' ,
             inelligibility_reason: 'hide_by_timeout',
           }));
@@ -66,17 +64,15 @@ class XPromoWrapper extends React.Component {
         }
 
         default: {
+          console.error('TESTING >', 'Event: cs.xpromo_dismiss', ' -> ', 'recent_session');
           dispatch(xpromoActions.promoPersistDeactivate());
-          dispatch(xpromoActions.trackXPromoEvent(status, {
+          dispatch(xpromoActions.trackXPromoEvent('cs.xpromo_dismiss', {
             interstitial_type: 'persistent_banner' ,
             inelligibility_reason: 'recent_session',
           }));
         }
-
       }
-
     }, isInterstitialDismissed);
-
   }
 
   onScroll = () => {

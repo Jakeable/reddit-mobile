@@ -42,7 +42,7 @@ export const promoDismissed = (dismissType) => async (dispatch, getState) => {
   if (dismissType) {
     dispatch(trackXPromoEvent(XPROMO_DISMISS, { dismiss_type: dismissType }));
   }
-  if (isXPromoPersistentEnabled(getState())){
+  if (isXPromoPersistentEnabled(getState())) {
     dispatch(promoPersistActivate());
   }
 };

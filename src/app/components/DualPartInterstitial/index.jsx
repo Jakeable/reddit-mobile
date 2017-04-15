@@ -27,7 +27,7 @@ export function DualPartInterstitial(props) {
     mixin,
     scrollPast,
     xpromoTheme,
-    isXPromoPersistentActive
+    isXPromoPersistentActive,
   } = props;
 
   const CLASS = 'DualPartInterstitial';
@@ -57,7 +57,7 @@ export const selector = createSelector(
   xpromoTheme,
   isXPromoPersistentActive,
   (device, scrollPast, xpromoTheme, isXPromoPersistentActive) => ({
-    device, scrollPast, xpromoTheme, isXPromoPersistentActive
+    device, scrollPast, xpromoTheme, isXPromoPersistentActive,
   }),
 );
 

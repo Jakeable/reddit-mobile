@@ -20,8 +20,8 @@ export default class TimeChecker {
   start(checker) {
     this.stop();
     this.setChecker(checker);
-    if( this.checker() ){
-      this.timer = setTimeout(() => { this.start() }, this.delay);
+    if (this.checker()) {
+      this.timer = setTimeout(() => { this.start(); }, this.delay);
     }
   }
 

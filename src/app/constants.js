@@ -174,7 +174,6 @@ export const genericErrors = {
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 };
 
-export const EVERY_TIME = 'every_time';
 export const EVERY_HOUR = 'every_hour';
 export const EVERY_DAY = 'every_day';
 export const EVERY_THREE_DAYS = 'every_three_days';
@@ -184,7 +183,6 @@ export const EVERY_TWO_WEEKS = 'every_two_weeks';
 const HOUR_IN_MS = 60 * 60 * 1000;
 
 export const EXPERIMENT_FREQUENCY_VARIANTS = {
-  [EVERY_TIME]: 0,
   [EVERY_HOUR]: HOUR_IN_MS,
   [EVERY_DAY]: 24 * HOUR_IN_MS,
   [EVERY_THREE_DAYS]: 3 * 24 * HOUR_IN_MS,

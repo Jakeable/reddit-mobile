@@ -2,7 +2,6 @@ import { find, some } from 'lodash';
 
 import {
   EXPERIMENT_FREQUENCY_VARIANTS,
-  EVERY_TIME,
   EVERY_HOUR,
   EVERY_DAY,
   flags as flagConstants,
@@ -15,7 +14,7 @@ import features, { isNSFWPage } from 'app/featureFlags';
 import getRouteMetaFromState from 'lib/getRouteMetaFromState';
 import { getExperimentData } from 'lib/experiments';
 import { getDevice, IPHONE, ANDROID } from 'lib/getDeviceFromState';
-import { isXpromoClosed } from 'lib/xpromoState';
+import { isInterstitialDimissed } from 'lib/xpromoState';
 import { trackXPromoIneligibleEvent } from 'lib/eventUtils';
 
 const { DAYMODE } = themes;
@@ -334,7 +333,7 @@ export function isXPromoPersistentActive(state) {
   return state.xpromo.persistent.active;
 }
 export function isXPromoPersistent(state) {
-  if(isXpromoClosed(state)){
+  if (isInterstitialDimissed(state)) {
     return anyFlagEnabled(state, XPROMO_PERSISTENT_FLAGS);
   }
 }

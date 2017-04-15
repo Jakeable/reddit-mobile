@@ -268,6 +268,7 @@ const config = {
         { url: 'xpromopersistent' },
         { variant: 'mweb_xpromo_persistent_ios:treatment' },
       ] },
+      { not: { peak: 'mweb_xpromo_modal_listing_click_ios' } },
     ],
   },
   [VARIANT_XPROMO_PERSISTENT_ANDROID]: {
@@ -279,6 +280,7 @@ const config = {
         { url: 'xpromopersistent' },
         { variant: 'mweb_xpromo_persistent_android:treatment' },
       ] },
+      { not: { peak: 'mweb_xpromo_modal_listing_click_android' } },
     ],
   },
   [VARIANT_XPROMO_INTERSTITIAL_COMMENTS_IOS]: {
@@ -474,6 +476,17 @@ flags.addRule('isMod', function(val) {
     userIsMod = names.includes(subreddit.toLowerCase());
   }
   return userIsMod === val;
+});
+
+flags.addRule('peak', function(experimentName) {
+  const experimentData = getExperimentData(this.state, experimentName);
+  if (!experimentData) {
+    return false;
+  }
+
+  const { variant } = experimentData;
+  const result = (variant && variant !== 'control_1' && variant !== 'control_2');
+  return result;
 });
 
 const firstBuckets = new Set();
